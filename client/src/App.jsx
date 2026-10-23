@@ -1,16 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { Activity, Server, Cpu, HardDrive } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const socket = io('http://localhost:5000');
 
 export default function App() {
   const [metrics, setMetrics] = useState(null);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
     socket.on('metrics', (data) => {
       setMetrics(data);
+
+      setHistory((prev) => {
+        const timeLabel = new Date(data.timestamp).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+
+        const newPoint = { time: timeLabel };
+        data.nodes.forEach((node) => {
+          newPoint[node.name] = node.time !== null ? node.time : 0;
+        });
+
+        const updated = [...prev, newPoint];
+        return updated.slice(-10); // Keep last 10 data points
+      });
     });
+
     return () => socket.off('metrics');
   }, []);
 
@@ -29,14 +48,14 @@ export default function App() {
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <Activity className="text-emerald-400" /> Infrastructure Health Dashboard
           </h1>
-          <p className="text-slate-400 text-sm mt-1">Real-time status feed & system telemetry</p>
+          <p className="text-slate-400 text-sm mt-1">Real-time status feed & telemetry charts</p>
         </div>
         <span className="text-xs font-mono bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">
           LIVE
         </span>
       </header>
 
-      {/* Host Metrics Cards */}
+      {/* Host Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl flex items-center gap-4">
           <Cpu className="w-10 h-10 text-blue-400" />
@@ -51,6 +70,23 @@ export default function App() {
             <p className="text-slate-400 text-sm">Host RAM Utilization</p>
             <p className="text-2xl font-bold font-mono">{metrics.system.ramUsage}%</p>
           </div>
+        </div>
+      </div>
+
+      {/* Real-Time Latency Chart */}
+      <div className="bg-slate-800 border border-slate-700 p-6 rounded-xl mb-8">
+        <h2 className="text-lg font-semibold mb-4 text-slate-200">Real-Time Latency History (ms)</h2>
+        <div className="h-64 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={history}>
+              <XAxis dataKey="time" stroke="#64748b" />
+              <YAxis stroke="#64748b" />
+              <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }} />
+              <Line type="monotone" dataKey="Google DNS" stroke="#10b981" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="Cloudflare DNS" stroke="#3b82f6" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="Local Gateway" stroke="#a855f7" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
