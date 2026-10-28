@@ -1,0 +1,16 @@
+{
+  "name": "net-health-dash-server",
+  "version": "1.0.0",
+  "description": "Telemetry and network health polling backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "ping": "^0.4.4",
+    "socket.io": "^4.7.5",
+    "systeminformation": "^5.22.6"
+  }
+}
