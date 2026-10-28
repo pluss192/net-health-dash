@@ -1,5 +1,5 @@
 # 🖥️ IT Infrastructure & Network Health Dashboard
-
+[![Node.js CI](https://github.com/pluss192/net-health-dash/actions/workflows/ci.yml/badge.svg)](https://github.com/pluss192/net-health-dash/actions/workflows/ci.yml)
 A real-time network and system monitoring dashboard built to track node latency, device uptime, host system metrics (CPU/RAM), and historical latency telemetry.
 
 ## 🚀 Features
@@ -16,6 +16,6 @@ A real-time network and system monitoring dashboard built to track node latency,
 
 ## 📦 Getting Started
 ```bash
-git clone [https://github.com/pluss192/net-health-dash.git](https://github.com/pluss192/net-health-dash.git)
+git clone https://github.com/pluss192/net-health-dash.git
 cd net-health-dash
 docker-compose up --build
